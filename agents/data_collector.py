@@ -1,4 +1,3 @@
-# agents/data_collector.py
 from tools.fetchers import fetch_latest_news, fetch_stock_data
 
 class DataCollectorAgent:

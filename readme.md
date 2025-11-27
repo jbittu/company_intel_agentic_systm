@@ -6,13 +6,13 @@ This application gathers real-time company information—including news & stock 
 ##  Core Features
 
 ###  Multi-Agent Architecture
-```bash
+
 | Agent | Responsibility |
 |-------|----------------|
 | **Data Collector Agent** | Fetches real-time company news & stock market data |
 | **Analyst Agent (Gemini 2.5)** | Summarizes data, finds risks, trends, recommendations |
 | **Orchestrator Agent** | Coordinates agents, maintains memory using LangChain |
-```
+
 
 ###  Streamlit Web Interface
 - Enter company name or ticker (e.g., *Google*, *AAPL*)
@@ -46,7 +46,7 @@ This application gathers real-time company information—including news & stock 
  Real Stocks (AV API) Summary & Risks   Across Sessions
 ```
 
-## 📁 Project Structure
+##  Project Structure
 
 ```bash
 company_intel_agentic_system/
@@ -104,13 +104,13 @@ ALPHA_VANTAGE_KEY=your_alpha_vantage_key
 
 - Get Keys:
 
-```bash
+
 | Service | Link |
 |--------|------|
 | Gemini | https://aistudio.google.com/app/apikey |
 | NewsAPI | https://newsapi.org/ |
 | Alpha Vantage | https://www.alphavantage.co/ |
-```
+
 
 ##  Testing Backend Agents
 
@@ -153,3 +153,15 @@ Then visit:
 | Auto-fetch company profile + logo | ⏳ Planned |
 
 ---
+
+##  Credits
+
+Built with:
+
+- LangChain
+- Google Gemini 2.0 Flash
+- Streamlit
+- NewsAPI
+- Alpha Vantage
+
+
