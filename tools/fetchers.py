@@ -1,42 +1,89 @@
 # tools/fetchers.py
-import datetime
-import random
+import os
+import requests
+from datetime import datetime, timedelta
+
 
 def fetch_latest_news(company: str, limit=5):
-    now = datetime.datetime.utcnow()
-    samples = [
-        f"{company} launches new AI product",
-        f"{company} reports strong Q4 earnings",
-        f"{company} expands into Europe",
-        f"{company} faces supply chain challenges",
-        f"{company} announces strategic partnership"
-    ]
+    api_key = os.getenv("NEWSAPI_KEY")
+    if not api_key:
+        raise ValueError("Missing NEWSAPI_KEY in .env")
+
+    url = "https://newsapi.org/v2/everything"
+    params = {
+        "qInTitle": company,       
+        "sortBy": "publishedAt",
+        "language": "en",
+        "pageSize": limit,
+        "apiKey": api_key
+    }
+
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    if "articles" not in data:
+        return [{
+            "title": "No articles found",
+            "summary": "",
+            "published_at": "",
+            "url": ""
+        }]
 
     news = []
-    for i in range(limit):
+    for article in data["articles"]:
         news.append({
-            "title": samples[i],
-            "summary": "This is a sample summary used for demonstration.",
-            "published_at": (now - datetime.timedelta(hours=i*6)).isoformat(),
-            "url": "https://example.com/news"
+            "title": article.get("title", ""),
+            "summary": article.get("description", ""),
+            "published_at": article.get("publishedAt", ""),
+            "url": article.get("url", "")
         })
-    return news
+
+    return news[:limit]
+
+
+
 
 
 def fetch_stock_data(company: str, days=7):
-    base = 100 + random.uniform(-10, 10)
-    prices = []
-    for d in range(days):
-        prices.append({
-            "date": (datetime.date.today() - datetime.timedelta(days=d)).isoformat(),
-            "close": round(base + random.uniform(-4, 4), 2)
-        })
+    api_key = os.getenv("ALPHA_VANTAGE_KEY")
+    if not api_key:
+        raise ValueError("Missing ALPHA_VANTAGE_KEY in .env")
 
-    change = round(((prices[-1]["close"] - prices[0]["close"]) / prices[0]["close"]) * 100, 2)
+    url = (
+        "https://www.alphavantage.co/query?"
+        f"function=TIME_SERIES_DAILY&symbol={company}&apikey={api_key}"
+    )
+
+    response = requests.get(url)
+    data = response.json()
+
+    if "Time Series (Daily)" not in data:
+        return {
+            "symbol": company,
+            "prices": [],
+            "latest_close": None,
+            "7d_change_pct": None
+        }
+
+    ts = data["Time Series (Daily)"]
+    sorted_dates = sorted(ts.keys(), reverse=True)
+
+    prices = []
+    for date in sorted_dates[:days]:
+        close_price = float(ts[date]["4. close"])
+        prices.append({"date": date, "close": close_price})
+
+    # Compute change %
+    if len(prices) >= 2:
+        first = prices[-1]["close"]
+        last = prices[0]["close"]
+        change_pct = round(((last - first) / first) * 100, 2)
+    else:
+        change_pct = 0
 
     return {
-        "symbol": company[:6].upper(),
+        "symbol": company,
         "prices": prices,
-        "latest_close": prices[-1]["close"],
-        "7d_change_pct": change
+        "latest_close": prices[0]["close"] if prices else None,
+        "7d_change_pct": change_pct
     }

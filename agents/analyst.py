@@ -25,7 +25,7 @@ class AnalystAgent:
     Agent 2: Takes collected data and produces insights using Gemini.
     """
 
-    def __init__(self, api_key: str, model: str = "gemini-pro", temperature=0.2):
+    def __init__(self, api_key: str, model: str = "gemini-2.0-flash", temperature=0.2):
         self.llm = ChatGoogleGenerativeAI(
             google_api_key=api_key,
             model=model,
